@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presentation</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:      #f5f4f0;
+  --surface: #ffffff;
+  --border:  #e0ddd6;
+  --text:    #1a1917;
+  --muted:   #888580;
+  --accent:  #2563eb;
+  --success: #16a34a;
+  --danger:  #dc2626;
+  --radius:  10px;
+  --sans:    system-ui, -apple-system, sans-serif;
+  --mono:    ui-monospace, monospace;
+}
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); }
+#app { display: flex; flex-direction: column; min-height: 100vh; }
+#progress-bar { height: 3px; background: var(--accent); transition: width 0.4s ease; position: fixed; top: 0; left: 0; z-index: 10; }
+#slide-counter { position: fixed; top: 14px; right: 20px; font: 12px var(--mono); color: var(--muted); z-index: 10; }
+#stage { flex: 1; display: flex; align-items: center; justify-content: center; padding: 60px 40px 20px; }
+.slide { width: 100%; max-width: 780px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px; animation: fadein 0.3s ease both; }
+@keyframes fadein { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.slide-tag { font: 11px/1 var(--mono); color: var(--accent); letter-spacing: .12em; text-transform: uppercase; }
+.slide-title { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 700; line-height: 1.15; }
+.slide-body { font-size: 1rem; line-height: 1.75; color: var(--text); max-width: 640px; text-align: left; }
+.slide-body p + p { margin-top: .9em; }
+.image-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.img-card { width: 200px; height: 130px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; color: var(--muted); font: 11px var(--mono); flex-direction: column; gap: 6px; }
+.img-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 26px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--surface); color: var(--text); font: 500 .9rem var(--sans); cursor: pointer; transition: all .15s ease; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn:active { transform: scale(.97); }
+.btn:disabled { opacity: .35; pointer-events: none; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { opacity: .88; color: #fff; }
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 620px; }
+@media (max-width: 560px) { .options-grid { grid-template-columns: 1fr; } }
+.opt { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--surface); text-align: left; cursor: pointer; font: .9rem var(--sans); transition: all .15s ease; }
+.opt:hover:not(.locked) { border-color: var(--accent); background: #eff6ff; }
+.opt .letter { font: 12px var(--mono); color: var(--muted); flex-shrink: 0; }
+.opt.correct { border-color: var(--success); background: #f0fdf4; color: var(--success); }
+.opt.wrong { border-color: var(--danger); background: #fff5f5; color: var(--danger); }
+.opt.locked { cursor: default; }
+.input-row { display: flex; gap: 8px; width: 100%; max-width: 500px; }
+.text-input { flex: 1; padding: 11px 16px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--surface); font: .9rem var(--sans); outline: none; transition: border .15s; }
+.text-input:focus { border-color: var(--accent); }
+.text-input.correct { border-color: var(--success); background: #f0fdf4; }
+.text-input.wrong { border-color: var(--danger); }
+.feedback { font: 13px var(--mono); padding: 9px 16px; border-radius: 8px; display: none; }
+.feedback.show { display: block; }
+.feedback.ok { color: var(--success); background: #f0fdf4; }
+.feedback.err { color: var(--danger); background: #fff5f5; }
+.feedback.hint { color: #92400e; background: #fffbeb; }
+.order-wrap { display: flex; gap: 24px; width: 100%; max-width: 700px; align-items: flex-start; }
+.order-bank { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.order-slots { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.bank-label { font: 11px var(--mono); color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2px; }
+.bank-item, .slot-item { padding: 11px 14px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--surface); font: .9rem var(--sans); text-align: left; display: flex; align-items: center; gap: 10px; min-height: 46px; transition: all .15s ease; }
+.bank-item { cursor: pointer; }
+.bank-item:hover:not(.placed):not(.locked) { border-color: var(--accent); background: #eff6ff; }
+.bank-item.selected { border-color: var(--accent); background: #eff6ff; font-weight: 600; }
+.bank-item.placed { opacity: .28; pointer-events: none; }
+.bank-item.locked { pointer-events: none; }
+.slot-num { font: 12px var(--mono); color: var(--muted); flex-shrink: 0; min-width: 18px; }
+.slot-text { flex: 1; }
+.slot-empty { color: var(--muted); font-style: italic; font-size: .85rem; }
+.slot-x { margin-left: auto; font-size: 14px; color: var(--muted); cursor: pointer; flex-shrink: 0; padding: 0 4px; display: none; }
+.slot-x:hover { color: var(--danger); }
+.slot-item.filled .slot-x { display: block; }
+.slot-item.filled:not(.locked) { cursor: pointer; }
+.slot-item.filled:not(.locked):hover { border-color: var(--accent); background: #eff6ff; }
+.slot-item.correct { border-color: var(--success); background: #f0fdf4; }
+.slot-item.wrong { border-color: var(--danger); background: #fff5f5; }
+.order-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+#nav-bar { padding: 18px 32px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); }
+.done-icon { width: 72px; height: 72px; border-radius: 50%; border: 2px solid var(--success); background: #f0fdf4; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="progress-bar"></div>
+  <div id="slide-counter"></div>
+  <div id="stage"></div>
+  <div id="nav-bar">
+    <button class="btn" id="btn-prev" onclick="PRES.prev()">Back</button>
+    <button class="btn primary" id="btn-next" onclick="PRES.next()">Continue</button>
+  </div>
+</div>
+<script>
+class Slide {
+  constructor(cfg) { this.id = cfg.id || ('s' + Math.random().toString(36).slice(2)); this.tag = cfg.tag || null; }
+  render() { return ''; }
+  onMount() {}
+  canAdvance() { return true; }
+  onUnmount() {}
+}
+
+class IntroSlide extends Slide {
+  constructor(cfg) { super(cfg); this.title = cfg.title; this.subtitle = cfg.subtitle || null; this.images = cfg.images || []; }
+  render() {
+    const imgHTML = this.images.map(img => {
+      const src = typeof img === 'string' ? img : (img.src || '');
+      const alt = typeof img === 'object' ? (img.alt || '') : '';
+      if (!src) return `<div class="img-card"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="15" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M3 16l4.5-4 3.5 3.5 3-2.5 5 5"/></svg><span>${alt}</span></div>`;
+      return `<div class="img-card"><img src="${src}" alt="${alt}"></div>`;
+    }).join('');
+    return `${this.tag ? `<div class="slide-tag">${this.tag}</div>` : ''}<h1 class="slide-title">${this.title}</h1>${this.subtitle ? `<p style="color:var(--muted);font-size:1.05rem;max-width:560px;line-height:1.7">${this.subtitle}</p>` : ''}${imgHTML ? `<div class="image-row">${imgHTML}</div>` : ''}`;
+  }
+}
+
+class ContentSlide extends Slide {
+  constructor(cfg) { super(cfg); this.title = cfg.title; this.body = Array.isArray(cfg.body) ? cfg.body : [cfg.body]; }
+  render() {
+    return `${this.tag ? `<div class="slide-tag">${this.tag}</div>` : ''}<h2 class="slide-title">${this.title}</h2><div class="slide-body">${this.body.map(p => `<p>${p}</p>`).join('')}</div>`;
+  }
+}
+
+class QuizSlide extends Slide {
+  constructor(cfg) { super(cfg); this.question = cfg.question; this.type = cfg.type || 'choice'; this.options = cfg.options || []; this.answer = cfg.answer; this.hint = cfg.hint || null; this.ignoreCase = cfg.ignoreCase !== false; this._solved = false; }
+  render() {
+    const L = ['A','B','C','D','E','F','G'];
+    if (this.type === 'choice') {
+      return `${this.tag ? `<div class="slide-tag">${this.tag}</div>` : ''}<h2 class="slide-title">${this.question}</h2><div class="options-grid" id="grid-${this.id}">${this.options.map((o,i) => `<button class="opt" onclick="_Q${this.id}(${i})"><span class="letter">${L[i]}</span>${o}</button>`).join('')}</div><div class="feedback" id="fb-${this.id}"></div>${this.hint ? `<button class="btn" id="hbtn-${this.id}" onclick="_H${this.id}()" style="font-size:.85rem">Show hint</button>` : ''}`;
+    }
+    return `${this.tag ? `<div class="slide-tag">${this.tag}</div>` : ''}<h2 class="slide-title">${this.question}</h2><div class="input-row"><input class="text-input" id="ti-${this.id}" placeholder="Your answer..." onkeydown="if(event.key==='Enter')_Q${this.id}()"><button class="btn" onclick="_Q${this.id}()">Check</button></div><div class="feedback" id="fb-${this.id}"></div>${this.hint ? `<button class="btn" id="hbtn-${this.id}" onclick="_H${this.id}()" style="font-size:.85rem">Show hint</button>` : ''}`;
+  }
+  onMount() {
+    const fb = document.getElementById(`fb-${this.id}`);
+    const next = document.getElementById('btn-next');
+    next.disabled = true;
+    if (this.type === 'choice') {
+      window[`_Q${this.id}`] = (idx) => {
+        if (this._solved) return;
+        const btns = [...document.getElementById(`grid-${this.id}`).querySelectorAll('.opt')];
+        btns.forEach(b => b.classList.add('locked'));
+        if (idx === this.answer) { btns[idx].classList.add('correct'); fb.textContent = 'Correct!'; fb.className = 'feedback show ok'; this._solved = true; next.disabled = false; }
+        else { btns[idx].classList.add('wrong'); fb.textContent = 'Not quite — try again.'; fb.className = 'feedback show err'; setTimeout(() => { btns.forEach(b => b.classList.remove('wrong','locked')); fb.className = 'feedback'; }, 800); }
+      };
+    } else {
+      window[`_Q${this.id}`] = () => {
+        if (this._solved) return;
+        const inp = document.getElementById(`ti-${this.id}`);
+        let val = inp.value.trim(), ans = String(this.answer).trim();
+        if (this.ignoreCase) { val = val.toLowerCase(); ans = ans.toLowerCase(); }
+        if (val === ans) { inp.classList.add('correct'); inp.disabled = true; fb.textContent = 'Correct!'; fb.className = 'feedback show ok'; this._solved = true; next.disabled = false; const hb = document.getElementById(`hbtn-${this.id}`); if (hb) hb.remove(); }
+        else { inp.classList.add('wrong'); fb.textContent = 'Not quite — try again.'; fb.className = 'feedback show err'; setTimeout(() => inp.classList.remove('wrong'), 600); }
+      };
+    }
+    if (this.hint) { window[`_H${this.id}`] = () => { fb.textContent = 'Hint: ' + this.hint; fb.className = 'feedback show hint'; const hb = document.getElementById(`hbtn-${this.id}`); if (hb) hb.remove(); }; }
+  }
+  canAdvance() { return this._solved; }
+}
+
+class OrderingSlide extends Slide {
+  constructor(cfg) { super(cfg); this.question = cfg.question; this.items = cfg.items; this._shuffled = this._shuffle([...cfg.items]); this._solved = false; }
+  _shuffle(arr) { for (let i = arr.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+  render() {
+    return `${this.tag ? `<div class="slide-tag">${this.tag}</div>` : ''}<h2 class="slide-title">${this.question}</h2><div class="order-wrap"><div class="order-bank"><div class="bank-label">Items</div>${this._shuffled.map((t,i) => `<div class="bank-item" id="bank-${this.id}-${i}" onclick="_OB${this.id}(${i})">${t}</div>`).join('')}</div><div class="order-slots"><div class="bank-label">Your order</div>${this.items.map((_,i) => `<div class="slot-item" id="slot-${this.id}-${i}" onclick="_OS${this.id}(${i})"><span class="slot-num">${i+1}</span><span class="slot-text slot-empty">click to place</span><span class="slot-x" onclick="event.stopPropagation();_OR${this.id}(${i})">&#x2715;</span></div>`).join('')}</div></div><div class="feedback" id="fb-${this.id}"></div><div class="order-actions"><button class="btn" onclick="_OC${this.id}()">Check order</button><button class="btn" onclick="_ORES${this.id}()">Reset</button></div>`;
+  }
+  onMount() {
+    const next = document.getElementById('btn-next'), fb = document.getElementById(`fb-${this.id}`);
+    next.disabled = true;
+    const slots = new Array(this.items.length).fill(null);
+    let sel = null;
+    const bEl = i => document.getElementById(`bank-${this.id}-${i}`);
+    const sEl = i => document.getElementById(`slot-${this.id}-${i}`);
+    const renderSlot = i => { const el = sEl(i), t = slots[i]; el.querySelector('.slot-text').textContent = t || 'click to place'; el.querySelector('.slot-text').className = 'slot-text' + (t ? '' : ' slot-empty'); el.classList.toggle('filled', !!t); el.classList.remove('correct','wrong'); };
+    window[`_OB${this.id}`] = i => { if (this._solved || bEl(i).classList.contains('placed')) return; if (sel === i) { bEl(i).classList.remove('selected'); sel = null; return; } if (sel !== null) bEl(sel).classList.remove('selected'); bEl(i).classList.add('selected'); sel = i; fb.className = 'feedback'; };
+    window[`_OS${this.id}`] = i => { if (this._solved || sel === null) return; if (slots[i] !== null) { const oi = this._shuffled.indexOf(slots[i]); if (oi !== -1) bEl(oi).classList.remove('placed'); } slots[i] = this._shuffled[sel]; bEl(sel).classList.add('placed'); bEl(sel).classList.remove('selected'); sel = null; renderSlot(i); fb.className = 'feedback'; };
+    window[`_OR${this.id}`] = i => { if (this._solved || !slots[i]) return; const oi = this._shuffled.indexOf(slots[i]); if (oi !== -1) bEl(oi).classList.remove('placed'); slots[i] = null; renderSlot(i); fb.className = 'feedback'; };
+    window[`_OC${this.id}`] = () => { if (this._solved) return; if (slots.some(s => s === null)) { fb.textContent = 'Fill all slots before checking.'; fb.className = 'feedback show hint'; return; } let ok = true; slots.forEach((t,i) => { sEl(i).classList.remove('correct','wrong'); const c = t === this.items[i]; sEl(i).classList.add(c ? 'correct' : 'wrong'); if (!c) ok = false; }); if (ok) { fb.textContent = 'Perfect order!'; fb.className = 'feedback show ok'; this._solved = true; next.disabled = false; this._shuffled.forEach((_,i) => bEl(i).classList.add('locked')); slots.forEach((_,i) => sEl(i).classList.add('locked')); } else { fb.textContent = 'Some items are wrong (marked red). Keep going!'; fb.className = 'feedback show err'; } };
+    window[`_ORES${this.id}`] = () => { if (this._solved) return; slots.fill(null); slots.forEach((_,i) => renderSlot(i)); this._shuffled.forEach((_,i) => bEl(i).classList.remove('placed','selected')); sel = null; fb.className = 'feedback'; };
+  }
+  canAdvance() { return this._solved; }
+}
+
+class CompletionSlide extends Slide {
+  constructor() { super({ id: '__done__' }); }
+  render() { return `<div class="done-icon">&#10003;</div><h1 class="slide-title">You're done!</h1><p style="color:var(--muted)">You've completed the presentation.</p>`; }
+}
+
+class Presentation {
+  constructor(slides) { this._slides = [...slides, new CompletionSlide()]; this._idx = 0; this._show(); }
+  _show() {
+    const s = this._slides[this._idx], stage = document.getElementById('stage');
+    document.getElementById('progress-bar').style.width = (this._idx / (this._slides.length-1) * 100) + '%';
+    document.getElementById('slide-counter').textContent = `${this._idx+1} / ${this._slides.length}`;
+    document.getElementById('btn-prev').style.visibility = this._idx > 0 ? 'visible' : 'hidden';
+    const next = document.getElementById('btn-next');
+    next.style.display = this._idx === this._slides.length-1 ? 'none' : '';
+    next.disabled = false;
+    const div = document.createElement('div'); div.className = 'slide'; div.innerHTML = s.render();
+    stage.innerHTML = ''; stage.appendChild(div); s.onMount();
+    if (!s.canAdvance()) next.disabled = true;
+  }
+  next() { const s = this._slides[this._idx]; if (!s.canAdvance()) return; s.onUnmount(); if (this._idx < this._slides.length-1) { this._idx++; this._show(); } }
+  prev() { if (this._idx > 0) { this._slides[this._idx].onUnmount(); this._idx--; this._show(); } }
+}
+document.addEventListener('keydown', e => { if (e.key==='ArrowRight') PRES.next(); if (e.key==='ArrowLeft') PRES.prev(); });
+
+/* ── DEMO ─────────────────────────────────────────── */
+const PRES = new Presentation([
+
+  new IntroSlide({
+    tag:      'tag',
+    title:    'title',
+    subtitle: 'subtitle',
+    images: [
+      { src: '', alt: 'alt' },
+      { src: '', alt: 'alt' },
+      { src: '', alt: 'alt' },
+    ]
+  }),
+
+  new ContentSlide({
+    tag:   'tag',
+    title: 'title',
+    body: [
+      'body[0]',
+      'body[1]',
+    ]
+  }),
+
+  new QuizSlide({
+    tag:      'tag',
+    question: 'question',
+    type:     'choice',
+    options:  ['options[0]', 'options[1]', 'options[2]', 'options[3]'],
+    answer:   0,
+    hint:     'hint',
+  }),
+
+  new QuizSlide({
+    tag:      'tag',
+    question: 'question',
+    type:     'text',
+    answer:   'answer',
+    hint:     'answer is answer',
+  }),
+
+  new OrderingSlide({
+    tag:      'tag',
+    question: 'question',
+    items: [
+      'items[0]',
+      'items[1]',
+      'items[2]',
+      'items[3]',
+    ]
+  }),
+
+]);
+</script>
+</body>
+</html>
