@@ -207,52 +207,213 @@ document.addEventListener('keydown', e => { if (e.key==='ArrowRight') PRES.next(
 /* ── DEMO ─────────────────────────────────────────── */
 const PRES = new Presentation([
 
+  /* 0 — INTRO */
   new IntroSlide({
-    tag:      'tag',
-    title:    'title',
-    subtitle: 'subtitle',
-    images: [
-      { src: '', alt: 'alt' },
-      { src: '', alt: 'alt' },
-      { src: '', alt: 'alt' },
-    ]
+    tag:      'Hooman & Julian',
+    title:    'How has devolution strengthened regional identities in Scotland, Wales, and Northern Ireland?',
+    subtitle: 'A look at power, identity and the future of the United Kingdom',
   }),
 
+  /* 1 — WHAT IS DEVOLUTION */
   new ContentSlide({
-    tag:   'tag',
-    title: 'title',
+    tag:   'Section 1, the Key Terms',
+    title: 'What is Devolution?',
     body: [
-      'body[0]',
-      'body[1]',
-    ]
+      'Transfer of authority: Power is moved from Westminster to regional governments the Scottish Parliament, Welsh Senedd, and Northern Ireland Assembly, which can then make independent decisions.',
+      'The word originates from Latin, meaning "to roll down."',
+      'Not a federal system: Westminster theoretically retains parliamentary sovereignty and could reverse devolution, though in practice this is politically near impossible.',
+      'Asymmetric: Different regions hold different levels and types of devolved power.',
+    ],
   }),
 
+  /* 2 — DEVOLVED vs RESERVED */
+  new ContentSlide({
+    tag:   'Section 1, the Key Terms',
+    title: 'Devolved vs. Reserved Powers',
+    body: [
+      'Devolved (regions decide): Education, health, transport, culture, environment, housing, agriculture, and more.',
+      'Reserved (Westminster keeps): Foreign policy, national defence, immigration, citizenship, most taxation, and currency.',
+      'In practice: Westminster sets broad national exam standards, but the Scottish Parliament decides the curriculum, school holidays, and whether tuition fees apply.',
+    ],
+  }),
+
+  /* 3 — REGIONAL IDENTITY */
+  new ContentSlide({
+    tag:   'Section 1, the Key Terms',
+    title: 'Regional Identity',
+    body: [
+      'People in Scotland, Wales, and Northern Ireland often feel a stronger regional identity than people in England. Rooted in distinct histories, cultures, and languages.',
+      'Scotland: Deep connection to traditions and Highland culture.',
+      'Wales: The Welsh language (Cymraeg) is a living marker of distinct nationhood.',
+      'Northern Ireland: A complex identity shaped by unionist, nationalist, and mixed communities with their own political structures.',
+    ],
+  }),
+
+  /* 4 — WHY RELEVANT TODAY */
+  new ContentSlide({
+    tag:   'Section 1, the Key Terms',
+    title: 'Why Does This Still Matter Today?',
+    body: [
+      'Brexit divide: Scotland and Northern Ireland voted Remain; England and Wales voted Leave. This created serious political tensions.',
+      'Northern Ireland was economically weakened by Brexit, and many Scots feel forced out of the EU against their will.',
+      'Independence pressure: These divisions have led many Scots to see devolution as insufficient and to push for full independence and EU reentry.',
+      'Destabilisation risk: These pressures threaten to break up the United Kingdom itself.',
+    ],
+  }),
+
+  /* QUIZ 1 — choice */
   new QuizSlide({
-    tag:      'tag',
-    question: 'question',
+    tag:      'Section 1 Check',
+    question: 'Which of these is a RESERVED power, meaning it stays with Westminster?',
     type:     'choice',
-    options:  ['options[0]', 'options[1]', 'options[2]', 'options[3]'],
-    answer:   0,
-    hint:     'hint',
+    options:  ['Education', 'National Defence', 'Housing', 'Agriculture'],
+    answer:   1,
+    hint:     'Reserved powers are the big national issues: defence, foreign policy, immigration, currency.',
   }),
 
+  /* 6 — BACKGROUND: UK */
+  new ContentSlide({
+    tag:   'Section 2, the Historical Background',
+    title: 'What is the United Kingdom?',
+    body: [
+      'The UK is a union of four historically distinct nations: England (south-east), Scotland (north), Wales (west), and Northern Ireland (north of Ireland).',
+      'England and Wales: Wales was integrated into the English state in the 16th century.',
+      'Scotland: Joined through a negotiated union in 1706-07, retaining its own judicial system and national church.',
+      'Northern Ireland: Created by the partition of Ireland in the 1920s, with a distinctive political structure to this day.',
+    ],
+  }),
+
+  /* 7 — TIMELINE */
+  new ContentSlide({
+    tag:     'Section 2, the Historical Background',
+    title:   'Key Milestones to 1999',
+    variant: 'timeline',
+    body: [
+      '1885 The Scottish Office is established: takes responsibility for education under a London appointed minister.',
+      '1886 First Home Rule Bill for Ireland, results: rejected.',
+      '1920 Northern Ireland gets limited self government under the Government of Ireland Act.',
+      '1922 to 1970 The Stormont government in Belfast governs Northern Ireland autonomously.',
+      '1972 Westminster dissolves the Northern Ireland Assembly indefinitely, suspending devolution.',
+      '1970s Labour attempts devolution for Scotland and Wales: results: referendums in 1979 fail.',
+      '1990s John Major supports regional self government but remains politically unsuccessful in Scotland and Wales.',
+      '1997 Tony Blair holds new referendums: Scotland (74.3% yes) and Wales (50.3% yes) vote for their own parliaments.',
+      '1998 The Good Friday Agreement is signed: Requiring power sharing between unionists and nationalists in Northern Ireland.',
+      '1999 Scottish Parliament, Welsh Assembly (now Senedd), and Northern Ireland Assembly are all established.',
+    ],
+  }),
+
+  /* QUIZ 2 — text */
   new QuizSlide({
-    tag:      'tag',
-    question: 'question',
+    tag:      'Section 2 Check',
+    question: 'In what year was the Good Friday Agreement signed, bringing power sharing to Northern Ireland?',
     type:     'text',
-    answer:   'answer',
-    hint:     'answer is answer',
+    answer:   '1998',
+    hint:     'The agreement was negotiated and ratified by referendums in both Northern Ireland and the Republic of Ireland.',
   }),
 
+  /* ORDERING — milestones */
   new OrderingSlide({
-    tag:      'tag',
-    question: 'question',
+    tag:      'Section 2, the Order It',
+    question: 'Drag these milestones into the correct chronological order:',
     items: [
-      'items[0]',
-      'items[1]',
-      'items[2]',
-      'items[3]',
-    ]
+      'First Home Rule Bill for Ireland rejected (1886)',
+      'Westminster suspends Northern Ireland Assembly (1972)',
+      'Blair referendums: Scotland and Wales vote Yes (1997)',
+      'Good Friday Agreement signed (1998)',
+      'Scottish Parliament, Senedd, and NI Assembly established (1999)',
+    ],
+  }),
+
+  /* 10 — POWER TRANSFERS */
+  new ContentSlide({
+    tag:   'Section 3, the Changes from Devolution',
+    title: 'Power Transfers: What Each Region Gained',
+    variant: 'regions',
+    body: [
+      'Scotland (Holyrood, Edinburgh)|Education|Health|Housing|Justice|Agriculture|Environment|Some transport|Significant tax powers (income tax, stamp duty, air passenger duty)',
+      'Wales (Senedd, Cardiff Bay)|Education|Health|Housing|Environment|Local government|Transport|Welsh language policy|Some tax control (historically the weakest devolution)',
+      'Northern Ireland (Stormont, Belfast)|Transferred: Education, health, justice, agriculture|Reserved: Prisons (could move to Stormont)|Excepted: Defence, elections (cannot move)|Requires mandatory power-sharing between unionists and nationalists',
+    ],
+  }),
+
+  /* 11 — RESOURCES */
+  new ContentSlide({
+    tag:   'Section 3, the Changes from Devolution',
+    title: 'Regional Control over Resources',
+    body: [
+      'Scotland has significant oil and gas reserves in the North Sea. Devolution allows Scotland to regulate extraction levels and environmental standards.',
+      'However, the revenue from these resources flows into the British national budget, not the Scottish budget. This is a major point of contention in the independence debate.',
+      'The Barnett Formula distributes money to devolved nations, but its fairness is regularly contested by all sides.',
+      'England has no devolved parliament, but metro mayors (e.g. Greater Manchester) now hold powers over local economy, housing, and transport. Labour under Starmer is actively expanding this.',
+    ],
+  }),
+
+  /* QUIZ 3 — choice */
+  new QuizSlide({
+    tag:      'Section 3 Check',
+    question: 'Oil and gas revenue from Scottish reserves currently goes into which budget?',
+    type:     'choice',
+    options:  ['Scottish budget', 'Welsh budget', 'British national budget', 'EU budget'],
+    answer:   2,
+    hint:     'This is one of the SNP\'s key arguments for independence. Scotland controls extraction but not the profits.',
+  }),
+
+  /* 13 — SCOTLAND INDEPENDENCE */
+  new ContentSlide({
+    tag:   'Section 4, the Current Debates',
+    title: "Scotland's Independence Debate",
+    body: [
+      "SNP argument: Scotland has its own identity, resources, and a distinct political direction. Independence would mean direct control over oil revenue and the ability to rejoin the EU.",
+      "Westminster's counter: Scotland benefits economically from the UK union. Independence would create serious economic instability and a hard border with England.",
+      "Underlying tension: The SNP argues devolution has not gone far enough, that Scots still feel powerless on the issues that matter most.",
+      "Westminster's fear: Granting a second independence referendum could inspire similar movements in Wales, fragmenting the entire UK.",
+    ],
+  }),
+
+  /* 14 — OPEN TENSIONS */
+  new ContentSlide({
+    tag:   'Section 4, the Current Debates',
+    title: 'Open Questions and Unresolved Tensions',
+    body: [
+      "West Lothian Question: Scottish, Welsh, and Northern Irish MPs can vote on England only laws at Westminster, however English MPs have no equivalent say over devolved matters. Still unresolved.",
+      "NI Instability: The Assembly collapsed in 2017 to 2020 (DUP vs Sinn Féin disputes) and again in 2022 to 2024 over post Brexit trade issues.",
+      "England's problem: With roughly 85% of the UK population, England doesn't fit neatly into any federal model, for which no one has a clean answer.",
+      "Parliamentary sovereignty vs. reality: Westminster could theoretically override devolved parliaments, but hasn't, and likely couldn't without a major political crisis.",
+    ],
+  }),
+
+  /* QUIZ 4 — choice */
+  new QuizSlide({
+    tag:      'Section 4 Check',
+    question: 'What is the "West Lothian Question"?',
+    type:     'choice',
+    options:  [
+      "Scotland's right to hold independence referendums",
+      "Scottish MPs voting on England only laws while English MPs can't vote on devolved matters",
+      "Wales demanding the same powers as Scotland",
+      "The formula used to distribute UK funding to devolved regions",
+    ],
+    answer:   1,
+    hint:     'It was named after the Scottish constituency whose MP, Tam Dalyell, first raised it in the 1970s.',
+  }),
+
+  /* 16 — CONCLUSION */
+  new ContentSlide({
+    tag:   'Conclusion',
+    title: 'Devolution: A Settlement or a Stepping Stone?',
+    body: [
+      'Devolution has given Scotland, Wales, and Northern Ireland real legislative power over key areas of daily life, strengthening distinct regional identities.',
+      'But it has also created new political tensions: asymmetry, Brexit, resource disputes, and growing independence movements.',
+      "The UK system remains uniquely flexible and also uniquely fragile. Westminster's theoretical sovereignty over devolved parliaments has never been tested in earnest.",
+      'The central question remains open: is devolution the final shape of the UK, or the beginning of something else entirely?',
+    ],
+  }),
+
+  /* 17 — OUTRO */
+  new IntroSlide({
+    tag:      'Thank You',
+    title:    'Questions?',
+    subtitle: 'Hooman & Julian',
   }),
 
 ]);
