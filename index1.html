@@ -442,6 +442,19 @@
   }
   .scroll-body::-webkit-scrollbar { width: 4px; }
   .scroll-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  
+  .quiz-gate-msg {
+    margin-top: 16px;
+    font-size: .82rem;
+    color: var(--muted);
+    letter-spacing: .06em;
+    font-style: italic;
+    animation: pulse-gate 2s ease-in-out infinite;
+  }
+  @keyframes pulse-gate {
+    0%, 100% { opacity: .5; }
+    50%       { opacity: 1; }
+  }
 </style>
 </head>
 <body>
@@ -522,6 +535,13 @@ class QuizSlide {
   render() {
     const el = document.createElement('div');
     el.className = 'slide quiz-slide';
+    el.quizAnswered = false;
+
+    const unlock = () => {
+      el.quizAnswered = true;
+      el.dispatchEvent(new CustomEvent('quiz-answered', { bubbles: true }));
+    };
+
     let inner = `<div class="tag">${this.tag || 'Quick Check'}</div><h2>${this.question}</h2>`;
 
     if (this.type === 'choice') {
@@ -529,14 +549,16 @@ class QuizSlide {
         `<button class="opt-btn" data-idx="${i}">${o}</button>`
       ).join('')}</div>`;
       inner += `<div class="quiz-hint">${this.hint}</div>`;
+      inner += `<p class="quiz-gate-msg">Answer to continue →</p>`;
       el.innerHTML = inner;
       const btns = el.querySelectorAll('.opt-btn');
       const hintEl = el.querySelector('.quiz-hint');
       btns.forEach(b => b.addEventListener('click', () => {
-        if (el.dataset.answered) return;
-        el.dataset.answered = '1';
+        if (el.quizAnswered) return;
         btns.forEach(x => x.classList.add(+x.dataset.idx === this.answer ? 'correct' : 'wrong'));
         hintEl.classList.add('visible');
+        el.querySelector('.quiz-gate-msg').style.display = 'none';
+        unlock();
       }));
     } else {
       inner += `<div class="text-input-wrap">
@@ -544,19 +566,28 @@ class QuizSlide {
         <button class="check-btn">Check</button>
         <div class="quiz-hint">${this.hint}</div>
       </div>`;
+      inner += `<p class="quiz-gate-msg">Submit your answer to continue →</p>`;
       el.innerHTML = inner;
       const input = el.querySelector('input');
       const btn   = el.querySelector('.check-btn');
       const hint  = el.querySelector('.quiz-hint');
-      btn.addEventListener('click', () => {
+      const doCheck = () => {
+        if (el.quizAnswered) return;
         const val = input.value.trim().toLowerCase();
+        if (!val) return;
         const correct = typeof this.answer === 'string'
           ? val === this.answer.toLowerCase()
           : this.answer.some(a => val === a.toLowerCase());
         input.classList.toggle('correct', correct);
         input.classList.toggle('wrong', !correct);
         hint.classList.add('visible');
-      });
+        input.disabled = true;
+        btn.disabled = true;
+        el.querySelector('.quiz-gate-msg').style.display = 'none';
+        unlock();
+      };
+      btn.addEventListener('click', doCheck);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') doCheck(); });
     }
     return el;
   }
@@ -645,12 +676,20 @@ class Presentation {
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  this.go(this.current + 1);
       if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    this.go(this.current - 1);
     });
+    this.deck.addEventListener('quiz-answered', () => this.updateNav());
 
     this.go(0);
   }
 
+
+  isNextBlocked() {
+    const el = this.rendered[this.current];
+    return el && el.quizAnswered === false;
+  }
+
   go(idx) {
     if (idx < 0 || idx >= this.slides.length) return;
+    if (idx > this.current && this.isNextBlocked()) return;
     if (this.rendered[this.current]) {
       this.rendered[this.current].classList.remove('active');
       this.rendered[this.current].classList.add('exit');
@@ -659,10 +698,15 @@ class Presentation {
     }
     this.current = idx;
     this.rendered[this.current].classList.add('active');
+    this.updateNav();
+  }
+
+  updateNav() {
+    const idx = this.current;
     this.counter.textContent = `${idx + 1} / ${this.slides.length}`;
     this.bar.style.width = `${((idx + 1) / this.slides.length) * 100}%`;
     this.btnPrev.disabled = idx === 0;
-    this.btnNext.disabled = idx === this.slides.length - 1;
+    this.btnNext.disabled = idx === this.slides.length - 1 || this.isNextBlocked();
   }
 }
 
