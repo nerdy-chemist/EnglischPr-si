@@ -3,208 +3,923 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Presentation</title>
+<title>Devolution – Hooman & Julian</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg:      #f5f4f0;
-  --surface: #ffffff;
-  --border:  #e0ddd6;
-  --text:    #1a1917;
-  --muted:   #888580;
-  --accent:  #2563eb;
-  --success: #16a34a;
-  --danger:  #dc2626;
-  --radius:  10px;
-  --sans:    system-ui, -apple-system, sans-serif;
-  --mono:    ui-monospace, monospace;
-}
-html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); }
-#app { display: flex; flex-direction: column; min-height: 100vh; }
-#progress-bar { height: 3px; background: var(--accent); transition: width 0.4s ease; position: fixed; top: 0; left: 0; z-index: 10; }
-#slide-counter { position: fixed; top: 14px; right: 20px; font: 12px var(--mono); color: var(--muted); z-index: 10; }
-#stage { flex: 1; display: flex; align-items: center; justify-content: center; padding: 60px 40px 20px; }
-.slide { width: 100%; max-width: 780px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px; animation: fadein 0.3s ease both; }
-@keyframes fadein { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-.slide-tag { font: 11px/1 var(--mono); color: var(--accent); letter-spacing: .12em; text-transform: uppercase; }
-.slide-title { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 700; line-height: 1.15; }
-.slide-body { font-size: 1rem; line-height: 1.75; color: var(--text); max-width: 640px; text-align: left; }
-.slide-body p + p { margin-top: .9em; }
-.image-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-.img-card { width: 200px; height: 130px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; color: var(--muted); font: 11px var(--mono); flex-direction: column; gap: 6px; }
-.img-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 26px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--surface); color: var(--text); font: 500 .9rem var(--sans); cursor: pointer; transition: all .15s ease; }
-.btn:hover { border-color: var(--accent); color: var(--accent); }
-.btn:active { transform: scale(.97); }
-.btn:disabled { opacity: .35; pointer-events: none; }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.btn.primary:hover { opacity: .88; color: #fff; }
-.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 620px; }
-@media (max-width: 560px) { .options-grid { grid-template-columns: 1fr; } }
-.opt { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--surface); text-align: left; cursor: pointer; font: .9rem var(--sans); transition: all .15s ease; }
-.opt:hover:not(.locked) { border-color: var(--accent); background: #eff6ff; }
-.opt .letter { font: 12px var(--mono); color: var(--muted); flex-shrink: 0; }
-.opt.correct { border-color: var(--success); background: #f0fdf4; color: var(--success); }
-.opt.wrong { border-color: var(--danger); background: #fff5f5; color: var(--danger); }
-.opt.locked { cursor: default; }
-.input-row { display: flex; gap: 8px; width: 100%; max-width: 500px; }
-.text-input { flex: 1; padding: 11px 16px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--surface); font: .9rem var(--sans); outline: none; transition: border .15s; }
-.text-input:focus { border-color: var(--accent); }
-.text-input.correct { border-color: var(--success); background: #f0fdf4; }
-.text-input.wrong { border-color: var(--danger); }
-.feedback { font: 13px var(--mono); padding: 9px 16px; border-radius: 8px; display: none; }
-.feedback.show { display: block; }
-.feedback.ok { color: var(--success); background: #f0fdf4; }
-.feedback.err { color: var(--danger); background: #fff5f5; }
-.feedback.hint { color: #92400e; background: #fffbeb; }
-.order-wrap { display: flex; gap: 24px; width: 100%; max-width: 700px; align-items: flex-start; }
-.order-bank { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-.order-slots { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-.bank-label { font: 11px var(--mono); color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2px; }
-.bank-item, .slot-item { padding: 11px 14px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--surface); font: .9rem var(--sans); text-align: left; display: flex; align-items: center; gap: 10px; min-height: 46px; transition: all .15s ease; }
-.bank-item { cursor: pointer; }
-.bank-item:hover:not(.placed):not(.locked) { border-color: var(--accent); background: #eff6ff; }
-.bank-item.selected { border-color: var(--accent); background: #eff6ff; font-weight: 600; }
-.bank-item.placed { opacity: .28; pointer-events: none; }
-.bank-item.locked { pointer-events: none; }
-.slot-num { font: 12px var(--mono); color: var(--muted); flex-shrink: 0; min-width: 18px; }
-.slot-text { flex: 1; }
-.slot-empty { color: var(--muted); font-style: italic; font-size: .85rem; }
-.slot-x { margin-left: auto; font-size: 14px; color: var(--muted); cursor: pointer; flex-shrink: 0; padding: 0 4px; display: none; }
-.slot-x:hover { color: var(--danger); }
-.slot-item.filled .slot-x { display: block; }
-.slot-item.filled:not(.locked) { cursor: pointer; }
-.slot-item.filled:not(.locked):hover { border-color: var(--accent); background: #eff6ff; }
-.slot-item.correct { border-color: var(--success); background: #f0fdf4; }
-.slot-item.wrong { border-color: var(--danger); background: #fff5f5; }
-.order-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-#nav-bar { padding: 18px 32px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); }
-.done-icon { width: 72px; height: 72px; border-radius: 50%; border: 2px solid var(--success); background: #f0fdf4; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+  :root {
+    --bg:        #0d0f14;
+    --surface:   #151820;
+    --card:      #1c2030;
+    --accent:    #c8a96e;
+    --accent2:   #4a90d9;
+    --text:      #e8e2d8;
+    --muted:     #7a7d8a;
+    --border:    rgba(200,169,110,0.18);
+    --red:       #d95252;
+    --green:     #52d97a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ── DECK ────────────────────────────────── */
+  #deck {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .45s ease, transform .45s ease;
+    transform: translateX(40px);
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateX(0);
+  }
+  .slide.exit {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+
+  /* decorative grid */
+  #deck::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,169,110,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,169,110,.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .slide > * { position: relative; z-index: 1; }
+
+  /* ── TAG ─────────────────────────────────── */
+  .tag {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .72rem;
+    font-weight: 500;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--border);
+    padding: 5px 14px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+  }
+
+  /* ── INTRO SLIDE ─────────────────────────── */
+  .intro-slide {
+    background: radial-gradient(ellipse 80% 60% at 60% 40%, #1e2540 0%, var(--bg) 70%);
+    text-align: center;
+  }
+  .intro-slide h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.7rem, 3.2vw, 3rem);
+    font-weight: 900;
+    line-height: 1.18;
+    max-width: 820px;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+  .intro-slide h1 em {
+    color: var(--accent);
+    font-style: normal;
+  }
+  .intro-slide .subtitle {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 600px;
+  }
+  .intro-deco {
+    display: flex;
+    gap: 12px;
+    margin-top: 40px;
+    justify-content: center;
+  }
+  .intro-deco span {
+    display: inline-block;
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+  }
+  .intro-deco span:nth-child(2) { background: var(--accent); width: 80px; }
+
+  /* ── CONTENT SLIDE ───────────────────────── */
+  .content-slide {
+    align-items: flex-start;
+  }
+  .content-slide h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 32px;
+    max-width: 760px;
+    border-left: 3px solid var(--accent);
+    padding-left: 20px;
+  }
+  .content-body {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+    max-width: 860px;
+  }
+  .content-body.two-col {
+    grid-template-columns: 1fr 1fr;
+  }
+  .body-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    font-size: .95rem;
+    line-height: 1.65;
+    color: #ccc8be;
+  }
+  .body-item strong {
+    color: var(--accent);
+    display: block;
+    margin-bottom: 6px;
+    font-size: .8rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  /* timeline variant */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    max-width: 860px;
+    max-height: 68vh;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+  .timeline::-webkit-scrollbar { width: 4px; }
+  .timeline::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .tl-item {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+  }
+  .tl-year {
+    min-width: 58px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .tl-text {
+    font-size: .9rem;
+    line-height: 1.55;
+    color: #ccc8be;
+  }
+
+  /* regions grid */
+  .regions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    width: 100%;
+    max-width: 900px;
+  }
+  .region-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 22px 20px;
+  }
+  .region-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: var(--accent);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .region-card ul { list-style: none; }
+  .region-card li {
+    font-size: .85rem;
+    color: #ccc8be;
+    padding: 4px 0;
+    line-height: 1.4;
+  }
+  .region-card li::before {
+    content: '→ ';
+    color: var(--accent2);
+  }
+
+  /* ── QUIZ SLIDE ──────────────────────────── */
+  .quiz-slide {
+    align-items: flex-start;
+  }
+  .quiz-slide h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.2rem, 2vw, 1.9rem);
+    font-weight: 700;
+    max-width: 820px;
+    line-height: 1.3;
+    margin-bottom: 32px;
+    color: var(--text);
+  }
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    width: 100%;
+    max-width: 820px;
+  }
+  .opt-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: background .2s, border-color .2s;
+  }
+  .opt-btn:hover { background: #222740; border-color: var(--accent); }
+  .opt-btn.correct { background: rgba(82,217,122,.12); border-color: var(--green); color: var(--green); }
+  .opt-btn.wrong   { background: rgba(217,82,82,.12);  border-color: var(--red);   color: var(--red); }
+  .quiz-hint {
+    margin-top: 18px;
+    font-size: .85rem;
+    color: var(--muted);
+    font-style: italic;
+    display: none;
+  }
+  .quiz-hint.visible { display: block; }
+  .text-input-wrap {
+    width: 100%;
+    max-width: 820px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .text-input-wrap input {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s;
+  }
+  .text-input-wrap input:focus { border-color: var(--accent); }
+  .text-input-wrap input.correct { border-color: var(--green); background: rgba(82,217,122,.08); }
+  .text-input-wrap input.wrong   { border-color: var(--red);   background: rgba(217,82,82,.08); }
+  .check-btn {
+    align-self: flex-start;
+    background: var(--accent);
+    color: #0d0f14;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  .check-btn:hover { opacity: .85; }
+
+  /* ── ORDERING SLIDE ──────────────────────── */
+  .ordering-slide { align-items: flex-start; }
+  .ordering-slide h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.2rem, 2vw, 1.9rem);
+    font-weight: 700;
+    max-width: 820px;
+    line-height: 1.3;
+    margin-bottom: 28px;
+    color: var(--text);
+  }
+  /* click-to-rank layout */
+  .order-wrap {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 860px;
+    align-items: flex-start;
+  }
+  @media (max-width: 700px) {
+    .order-wrap { flex-direction: column; }
+  }
+  .order-bank, .order-slots { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .order-col-label {
+    font-size: .72rem;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .bank-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 13px 16px;
+    font-size: .88rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color .2s, background .2s, opacity .2s;
+    line-height: 1.4;
+  }
+  .bank-item:hover:not(.placed):not(.locked) { border-color: var(--accent); background: #222740; }
+  .bank-item.selected { border-color: var(--accent); background: #222740; font-weight: 600; }
+  .bank-item.placed   { opacity: .25; pointer-events: none; }
+  .bank-item.locked   { pointer-events: none; }
+  .slot-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 13px 16px;
+    font-size: .88rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    min-height: 48px;
+    line-height: 1.4;
+  }
+  .slot-item:not(.locked):hover { border-color: var(--accent2); background: #1c2540; }
+  .slot-num {
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .78rem;
+    color: var(--accent);
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .slot-text { flex: 1; }
+  .slot-empty { color: var(--muted); font-style: italic; font-size: .82rem; }
+  .slot-x {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0 2px;
+    display: none;
+  }
+  .slot-x:hover { color: var(--red); }
+  .slot-item.filled .slot-x { display: block; }
+  .slot-item.correct { border-color: var(--green); background: rgba(82,217,122,.08); }
+  .slot-item.wrong   { border-color: var(--red);   background: rgba(217,82,82,.08); }
+  .order-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .order-check-btn {
+    background: var(--accent);
+    color: #0d0f14;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  .order-check-btn:hover { opacity: .85; }
+  .order-reset-btn {
+    background: none;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    cursor: pointer;
+    transition: border-color .2s, color .2s;
+  }
+  .order-reset-btn:hover { border-color: var(--accent); color: var(--text); }
+  .order-result {
+    margin-top: 12px;
+    font-size: .9rem;
+    color: var(--muted);
+    display: none;
+  }
+  .order-result.visible { display: block; }
+
+  /* ── SOURCES SLIDE ───────────────────────── */
+  .sources-slide { align-items: flex-start; }
+  .sources-slide h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 28px;
+    border-left: 3px solid var(--accent);
+    padding-left: 20px;
+  }
+  .sources-list {
+    width: 100%;
+    max-width: 860px;
+    max-height: 65vh;
+    overflow-y: auto;
+    padding-right: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sources-list::-webkit-scrollbar { width: 4px; }
+  .sources-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .source-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+  }
+  .source-num {
+    font-family: 'Playfair Display', serif;
+    font-size: .85rem;
+    color: var(--accent);
+    flex-shrink: 0;
+    min-width: 20px;
+  }
+  .source-text {
+    font-size: .85rem;
+    line-height: 1.55;
+    color: #ccc8be;
+  }
+  .source-text a {
+    color: var(--accent2);
+    text-decoration: none;
+    word-break: break-all;
+  }
+  .source-text a:hover { text-decoration: underline; }
+
+  /* ── NAV ─────────────────────────────────── */
+  #nav {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 100;
+    background: rgba(21,24,32,.85);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 10px 24px;
+    backdrop-filter: blur(12px);
+  }
+  .nav-btn {
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: color .2s, background .2s;
+  }
+  .nav-btn:hover { color: var(--accent); background: rgba(200,169,110,.08); }
+  .nav-btn:disabled { opacity: .3; cursor: default; }
+  #slide-counter {
+    font-size: .82rem;
+    color: var(--muted);
+    min-width: 60px;
+    text-align: center;
+    letter-spacing: .08em;
+  }
+
+  /* ── PROGRESS ────────────────────────────── */
+  #progress {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--border);
+    z-index: 200;
+  }
+  #progress-bar {
+    height: 100%;
+    background: var(--accent);
+    transition: width .4s ease;
+  }
+
+  /* scrollable body items */
+  .scroll-body {
+    max-height: 65vh;
+    overflow-y: auto;
+    padding-right: 6px;
+    width: 100%;
+    max-width: 860px;
+  }
+  .scroll-body::-webkit-scrollbar { width: 4px; }
+  .scroll-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  
+  .quiz-gate-msg {
+    margin-top: 16px;
+    font-size: .82rem;
+    color: var(--muted);
+    letter-spacing: .06em;
+    font-style: italic;
+    animation: pulse-gate 2s ease-in-out infinite;
+  }
+  @keyframes pulse-gate {
+    0%, 100% { opacity: .5; }
+    50%       { opacity: 1; }
+  }
 </style>
 </head>
 <body>
-<div id="app">
-  <div id="progress-bar"></div>
-  <div id="slide-counter"></div>
-  <div id="stage"></div>
-  <div id="nav-bar">
-    <button class="btn" id="btn-prev" onclick="PRES.prev()">Back</button>
-    <button class="btn primary" id="btn-next" onclick="PRES.next()">Continue</button>
-  </div>
-</div>
+
+<div id="progress"><div id="progress-bar"></div></div>
+<div id="deck"></div>
+<nav id="nav">
+  <button class="nav-btn" id="btn-prev">&#8592;</button>
+  <span id="slide-counter"></span>
+  <button class="nav-btn" id="btn-next">&#8594;</button>
+</nav>
+
 <script>
-class Slide {
-  constructor(cfg) { this.id = cfg.id || ('s' + Math.random().toString(36).slice(2)); this.tag = cfg.tag || null; }
-  render() { return ''; }
-  onMount() {}
-  canAdvance() { return true; }
-  onUnmount() {}
-}
+/* ─── SLIDE CLASSES ──────────────────────────────────────── */
 
-class IntroSlide extends Slide {
-  constructor(cfg) { super(cfg); this.title = cfg.title; this.subtitle = cfg.subtitle || null; this.images = cfg.images || []; }
+class IntroSlide {
+  constructor({ tag, title, subtitle }) {
+    this.tag = tag; this.title = title; this.subtitle = subtitle;
+  }
   render() {
-    const imgHTML = this.images.map(img => {
-      const src = typeof img === 'string' ? img : (img.src || '');
-      const alt = typeof img === 'object' ? (img.alt || '') : '';
-      if (!src) return `<div class="img-card"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="15" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M3 16l4.5-4 3.5 3.5 3-2.5 5 5"/></svg><span>${alt}</span></div>`;
-      return `<div class="img-card"><img src="${src}" alt="${alt}"></div>`;
-    }).join('');
-    return `${this.tag ? `<div class="slide-tag">${this.tag}</div>` : ''}<h1 class="slide-title">${this.title}</h1>${this.subtitle ? `<p style="color:var(--muted);font-size:1.05rem;max-width:560px;line-height:1.7">${this.subtitle}</p>` : ''}${imgHTML ? `<div class="image-row">${imgHTML}</div>` : ''}`;
+    const el = document.createElement('div');
+    el.className = 'slide intro-slide';
+    el.innerHTML = `
+      <div class="tag">${this.tag}</div>
+      <h1>${this.title.replace(/devolution/gi, '<em>Devolution</em>').replace(/Scotland|Wales|Northern Ireland/g, m => `<em>${m}</em>`)}</h1>
+      ${this.subtitle ? `<p class="subtitle">${this.subtitle}</p>` : ''}
+      <div class="intro-deco"><span></span><span></span><span></span></div>
+    `;
+    return el;
   }
 }
 
-class ContentSlide extends Slide {
-  constructor(cfg) { super(cfg); this.title = cfg.title; this.body = Array.isArray(cfg.body) ? cfg.body : [cfg.body]; }
-  render() {
-    return `${this.tag ? `<div class="slide-tag">${this.tag}</div>` : ''}<h2 class="slide-title">${this.title}</h2><div class="slide-body">${this.body.map(p => `<p>${p}</p>`).join('')}</div>`;
+class ContentSlide {
+  constructor({ tag, title, body, variant }) {
+    this.tag = tag; this.title = title; this.body = body; this.variant = variant || 'default';
   }
-}
+  render() {
+    const el = document.createElement('div');
+    el.className = 'slide content-slide';
 
-class QuizSlide extends Slide {
-  constructor(cfg) { super(cfg); this.question = cfg.question; this.type = cfg.type || 'choice'; this.options = cfg.options || []; this.answer = cfg.answer; this.hint = cfg.hint || null; this.ignoreCase = cfg.ignoreCase !== false; this._solved = false; }
-  render() {
-    const L = ['A','B','C','D','E','F','G'];
-    if (this.type === 'choice') {
-      return `${this.tag ? `<div class="slide-tag">${this.tag}</div>` : ''}<h2 class="slide-title">${this.question}</h2><div class="options-grid" id="grid-${this.id}">${this.options.map((o,i) => `<button class="opt" onclick="_Q${this.id}(${i})"><span class="letter">${L[i]}</span>${o}</button>`).join('')}</div><div class="feedback" id="fb-${this.id}"></div>${this.hint ? `<button class="btn" id="hbtn-${this.id}" onclick="_H${this.id}()" style="font-size:.85rem">Show hint</button>` : ''}`;
-    }
-    return `${this.tag ? `<div class="slide-tag">${this.tag}</div>` : ''}<h2 class="slide-title">${this.question}</h2><div class="input-row"><input class="text-input" id="ti-${this.id}" placeholder="Your answer..." onkeydown="if(event.key==='Enter')_Q${this.id}()"><button class="btn" onclick="_Q${this.id}()">Check</button></div><div class="feedback" id="fb-${this.id}"></div>${this.hint ? `<button class="btn" id="hbtn-${this.id}" onclick="_H${this.id}()" style="font-size:.85rem">Show hint</button>` : ''}`;
-  }
-  onMount() {
-    const fb = document.getElementById(`fb-${this.id}`);
-    const next = document.getElementById('btn-next');
-    next.disabled = true;
-    if (this.type === 'choice') {
-      window[`_Q${this.id}`] = (idx) => {
-        if (this._solved) return;
-        const btns = [...document.getElementById(`grid-${this.id}`).querySelectorAll('.opt')];
-        btns.forEach(b => b.classList.add('locked'));
-        if (idx === this.answer) { btns[idx].classList.add('correct'); fb.textContent = 'Correct!'; fb.className = 'feedback show ok'; this._solved = true; next.disabled = false; }
-        else { btns[idx].classList.add('wrong'); fb.textContent = 'Not quite — try again.'; fb.className = 'feedback show err'; setTimeout(() => { btns.forEach(b => b.classList.remove('wrong','locked')); fb.className = 'feedback'; }, 800); }
-      };
+    let inner = '';
+    if (this.tag) inner += `<div class="tag">${this.tag}</div>`;
+    if (this.title) inner += `<h2>${this.title}</h2>`;
+
+    if (this.variant === 'timeline') {
+      inner += `<div class="timeline">${this.body.map(b => {
+        const [year, ...rest] = b.split(' ');
+        return `<div class="tl-item"><span class="tl-year">${year}</span><span class="tl-text">${rest.join(' ')}</span></div>`;
+      }).join('')}</div>`;
+    } else if (this.variant === 'regions') {
+      inner += `<div class="regions-grid">${this.body.map(b => {
+        const lines = b.split('|');
+        const heading = lines[0];
+        const items = lines.slice(1);
+        return `<div class="region-card"><h3>${heading}</h3><ul>${items.map(i => `<li>${i}</li>`).join('')}</ul></div>`;
+      }).join('')}</div>`;
     } else {
-      window[`_Q${this.id}`] = () => {
-        if (this._solved) return;
-        const inp = document.getElementById(`ti-${this.id}`);
-        let val = inp.value.trim(), ans = String(this.answer).trim();
-        if (this.ignoreCase) { val = val.toLowerCase(); ans = ans.toLowerCase(); }
-        if (val === ans) { inp.classList.add('correct'); inp.disabled = true; fb.textContent = 'Correct!'; fb.className = 'feedback show ok'; this._solved = true; next.disabled = false; const hb = document.getElementById(`hbtn-${this.id}`); if (hb) hb.remove(); }
-        else { inp.classList.add('wrong'); fb.textContent = 'Not quite — try again.'; fb.className = 'feedback show err'; setTimeout(() => inp.classList.remove('wrong'), 600); }
-      };
+      const twoCol = this.body.length >= 4;
+      inner += `<div class="scroll-body"><div class="content-body${twoCol ? ' two-col' : ''}">${
+        this.body.map(b => {
+          const [label, ...rest] = b.split(':');
+          if (rest.length) return `<div class="body-item"><strong>${label}</strong>${rest.join(':')}</div>`;
+          return `<div class="body-item">${b}</div>`;
+        }).join('')
+      }</div></div>`;
     }
-    if (this.hint) { window[`_H${this.id}`] = () => { fb.textContent = 'Hint: ' + this.hint; fb.className = 'feedback show hint'; const hb = document.getElementById(`hbtn-${this.id}`); if (hb) hb.remove(); }; }
+
+    el.innerHTML = inner;
+    return el;
   }
-  canAdvance() { return this._solved; }
 }
 
-class OrderingSlide extends Slide {
-  constructor(cfg) { super(cfg); this.question = cfg.question; this.items = cfg.items; this._shuffled = this._shuffle([...cfg.items]); this._solved = false; }
-  _shuffle(arr) { for (let i = arr.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+class QuizSlide {
+  constructor({ tag, question, type, options, answer, hint }) {
+    this.tag = tag; this.question = question; this.type = type;
+    this.options = options; this.answer = answer; this.hint = hint;
+  }
   render() {
-    return `${this.tag ? `<div class="slide-tag">${this.tag}</div>` : ''}<h2 class="slide-title">${this.question}</h2><div class="order-wrap"><div class="order-bank"><div class="bank-label">Items</div>${this._shuffled.map((t,i) => `<div class="bank-item" id="bank-${this.id}-${i}" onclick="_OB${this.id}(${i})">${t}</div>`).join('')}</div><div class="order-slots"><div class="bank-label">Your order</div>${this.items.map((_,i) => `<div class="slot-item" id="slot-${this.id}-${i}" onclick="_OS${this.id}(${i})"><span class="slot-num">${i+1}</span><span class="slot-text slot-empty">click to place</span><span class="slot-x" onclick="event.stopPropagation();_OR${this.id}(${i})">&#x2715;</span></div>`).join('')}</div></div><div class="feedback" id="fb-${this.id}"></div><div class="order-actions"><button class="btn" onclick="_OC${this.id}()">Check order</button><button class="btn" onclick="_ORES${this.id}()">Reset</button></div>`;
+    const el = document.createElement('div');
+    el.className = 'slide quiz-slide';
+    el.quizAnswered = false;
+
+    const unlock = () => {
+      el.quizAnswered = true;
+      el.dispatchEvent(new CustomEvent('quiz-answered', { bubbles: true }));
+    };
+
+    let inner = `<div class="tag">${this.tag || 'Quick Check'}</div><h2>${this.question}</h2>`;
+
+    if (this.type === 'choice') {
+      inner += `<div class="options-grid">${this.options.map((o, i) =>
+        `<button class="opt-btn" data-idx="${i}">${o}</button>`
+      ).join('')}</div>`;
+      inner += `<div class="quiz-hint">${this.hint}</div>`;
+      inner += `<p class="quiz-gate-msg">Answer to continue →</p>`;
+      el.innerHTML = inner;
+      const btns = el.querySelectorAll('.opt-btn');
+      const hintEl = el.querySelector('.quiz-hint');
+      btns.forEach(b => b.addEventListener('click', () => {
+        if (el.quizAnswered) return;
+        btns.forEach(x => x.classList.add(+x.dataset.idx === this.answer ? 'correct' : 'wrong'));
+        hintEl.classList.add('visible');
+        el.querySelector('.quiz-gate-msg').style.display = 'none';
+        unlock();
+      }));
+    } else {
+      inner += `<div class="text-input-wrap">
+        <input type="text" placeholder="Your answer…" />
+        <button class="check-btn">Check</button>
+        <div class="quiz-hint">${this.hint}</div>
+      </div>`;
+      inner += `<p class="quiz-gate-msg">Submit your answer to continue →</p>`;
+      el.innerHTML = inner;
+      const input = el.querySelector('input');
+      const btn   = el.querySelector('.check-btn');
+      const hint  = el.querySelector('.quiz-hint');
+      const doCheck = () => {
+        if (el.quizAnswered) return;
+        const val = input.value.trim().toLowerCase();
+        if (!val) return;
+        const correct = typeof this.answer === 'string'
+          ? val === this.answer.toLowerCase()
+          : this.answer.some(a => val === a.toLowerCase());
+        input.classList.toggle('correct', correct);
+        input.classList.toggle('wrong', !correct);
+        hint.classList.add('visible');
+        input.disabled = true;
+        btn.disabled = true;
+        el.querySelector('.quiz-gate-msg').style.display = 'none';
+        unlock();
+      };
+      btn.addEventListener('click', doCheck);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') doCheck(); });
+    }
+    return el;
   }
-  onMount() {
-    const next = document.getElementById('btn-next'), fb = document.getElementById(`fb-${this.id}`);
-    next.disabled = true;
-    const slots = new Array(this.items.length).fill(null);
-    let sel = null;
-    const bEl = i => document.getElementById(`bank-${this.id}-${i}`);
-    const sEl = i => document.getElementById(`slot-${this.id}-${i}`);
-    const renderSlot = i => { const el = sEl(i), t = slots[i]; el.querySelector('.slot-text').textContent = t || 'click to place'; el.querySelector('.slot-text').className = 'slot-text' + (t ? '' : ' slot-empty'); el.classList.toggle('filled', !!t); el.classList.remove('correct','wrong'); };
-    window[`_OB${this.id}`] = i => { if (this._solved || bEl(i).classList.contains('placed')) return; if (sel === i) { bEl(i).classList.remove('selected'); sel = null; return; } if (sel !== null) bEl(sel).classList.remove('selected'); bEl(i).classList.add('selected'); sel = i; fb.className = 'feedback'; };
-    window[`_OS${this.id}`] = i => { if (this._solved || sel === null) return; if (slots[i] !== null) { const oi = this._shuffled.indexOf(slots[i]); if (oi !== -1) bEl(oi).classList.remove('placed'); } slots[i] = this._shuffled[sel]; bEl(sel).classList.add('placed'); bEl(sel).classList.remove('selected'); sel = null; renderSlot(i); fb.className = 'feedback'; };
-    window[`_OR${this.id}`] = i => { if (this._solved || !slots[i]) return; const oi = this._shuffled.indexOf(slots[i]); if (oi !== -1) bEl(oi).classList.remove('placed'); slots[i] = null; renderSlot(i); fb.className = 'feedback'; };
-    window[`_OC${this.id}`] = () => { if (this._solved) return; if (slots.some(s => s === null)) { fb.textContent = 'Fill all slots before checking.'; fb.className = 'feedback show hint'; return; } let ok = true; slots.forEach((t,i) => { sEl(i).classList.remove('correct','wrong'); const c = t === this.items[i]; sEl(i).classList.add(c ? 'correct' : 'wrong'); if (!c) ok = false; }); if (ok) { fb.textContent = 'Perfect order!'; fb.className = 'feedback show ok'; this._solved = true; next.disabled = false; this._shuffled.forEach((_,i) => bEl(i).classList.add('locked')); slots.forEach((_,i) => sEl(i).classList.add('locked')); } else { fb.textContent = 'Some items are wrong (marked red). Keep going!'; fb.className = 'feedback show err'; } };
-    window[`_ORES${this.id}`] = () => { if (this._solved) return; slots.fill(null); slots.forEach((_,i) => renderSlot(i)); this._shuffled.forEach((_,i) => bEl(i).classList.remove('placed','selected')); sel = null; fb.className = 'feedback'; };
-  }
-  canAdvance() { return this._solved; }
 }
 
-class CompletionSlide extends Slide {
-  constructor() { super({ id: '__done__' }); }
-  render() { return `<div class="done-icon">&#10003;</div><h1 class="slide-title">You're done!</h1><p style="color:var(--muted)">You've completed the presentation.</p>`; }
+class OrderingSlide {
+  constructor({ tag, question, items }) {
+    this.tag = tag; this.question = question; this.items = items;
+  }
+  render() {
+    const el = document.createElement('div');
+    el.className = 'slide ordering-slide';
+    const uid      = Math.random().toString(36).slice(2);
+    const shuffled = [...this.items].sort(() => Math.random() - .5);
+    const correct  = this.items;
+
+    // Build skeleton
+    el.innerHTML = `
+      <div class="tag">${this.tag || 'Order It'}</div>
+      <h2>${this.question}</h2>
+      <div class="order-wrap">
+        <div class="order-bank">
+          <div class="order-col-label">Items</div>
+          ${shuffled.map((t, i) => `<div class="bank-item" id="bank-${uid}-${i}">${t}</div>`).join('')}
+        </div>
+        <div class="order-slots">
+          <div class="order-col-label">Your order</div>
+          ${correct.map((_, i) => `
+            <div class="slot-item" id="slot-${uid}-${i}">
+              <span class="slot-num">${i+1}</span>
+              <span class="slot-text slot-empty">tap to place</span>
+              <span class="slot-x" id="slotx-${uid}-${i}">&#x2715;</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="order-actions">
+        <button class="order-check-btn">Check Order</button>
+        <button class="order-reset-btn">Reset</button>
+      </div>
+      <div class="order-result"></div>
+    `;
+
+    // State
+    const slots = new Array(correct.length).fill(null); // slot index -> text
+    let selected = null; // index into shuffled
+
+    const bankEl = i  => el.querySelector(`#bank-${uid}-${i}`);
+    const slotEl = i  => el.querySelector(`#slot-${uid}-${i}`);
+
+    const renderSlot = i => {
+      const se = slotEl(i);
+      const t  = slots[i];
+      se.querySelector('.slot-text').textContent = t || 'tap to place';
+      se.querySelector('.slot-text').className   = 'slot-text' + (t ? '' : ' slot-empty');
+      se.classList.toggle('filled', !!t);
+      se.classList.remove('correct', 'wrong');
+    };
+
+    // Select from bank
+    shuffled.forEach((text, i) => {
+      bankEl(i).addEventListener('click', () => {
+        if (el.dataset.locked) return;
+        const be = bankEl(i);
+        if (be.classList.contains('placed')) return;
+        if (selected === i) { be.classList.remove('selected'); selected = null; return; }
+        if (selected !== null) bankEl(selected).classList.remove('selected');
+        be.classList.add('selected');
+        selected = i;
+      });
+    });
+
+    // Place into slot
+    correct.forEach((_, i) => {
+      slotEl(i).addEventListener('click', () => {
+        if (el.dataset.locked) return;
+        if (selected === null) return;
+        // Return existing occupant to bank
+        if (slots[i] !== null) {
+          const oldIdx = shuffled.indexOf(slots[i]);
+          if (oldIdx !== -1) bankEl(oldIdx).classList.remove('placed');
+        }
+        slots[i] = shuffled[selected];
+        bankEl(selected).classList.add('placed');
+        bankEl(selected).classList.remove('selected');
+        selected = null;
+        renderSlot(i);
+        el.querySelector('.order-result').className = 'order-result';
+      });
+
+      // Remove from slot
+      el.querySelector(`#slotx-${uid}-${i}`).addEventListener('click', e => {
+        e.stopPropagation();
+        if (el.dataset.locked || !slots[i]) return;
+        const oldIdx = shuffled.indexOf(slots[i]);
+        if (oldIdx !== -1) bankEl(oldIdx).classList.remove('placed');
+        slots[i] = null;
+        renderSlot(i);
+        el.querySelector('.order-result').className = 'order-result';
+      });
+    });
+
+    // Check
+    el.querySelector('.order-check-btn').addEventListener('click', () => {
+      if (el.dataset.locked) return;
+      if (slots.some(s => s === null)) {
+        const res = el.querySelector('.order-result');
+        res.textContent = 'Fill all slots before checking.';
+        res.style.color = 'var(--muted)';
+        res.classList.add('visible');
+        return;
+      }
+      let allOk = true;
+      slots.forEach((t, i) => {
+        slotEl(i).classList.remove('correct', 'wrong');
+        const ok = t === correct[i];
+        slotEl(i).classList.add(ok ? 'correct' : 'wrong');
+        if (!ok) allOk = false;
+      });
+      const res = el.querySelector('.order-result');
+      res.textContent = allOk ? '✓ Perfect order!' : '✗ Some are wrong (red). Keep adjusting!';
+      res.style.color = allOk ? 'var(--green)' : 'var(--red)';
+      res.classList.add('visible');
+    });
+
+    // Reset
+    el.querySelector('.order-reset-btn').addEventListener('click', () => {
+      if (el.dataset.locked) return;
+      slots.fill(null);
+      slots.forEach((_, i) => renderSlot(i));
+      shuffled.forEach((_, i) => bankEl(i).classList.remove('placed', 'selected'));
+      selected = null;
+      el.querySelector('.order-result').className = 'order-result';
+    });
+
+    return el;
+  }
+}
+
+class SourcesSlide {
+  constructor({ tag, sources }) {
+    this.tag = tag || 'Sources';
+    this.sources = sources; // array of { label, url } or plain strings
+  }
+  render() {
+    const el = document.createElement('div');
+    el.className = 'slide sources-slide';
+    const items = this.sources.map((s, i) => {
+      const text = typeof s === 'string' ? s : s.label;
+      const url  = typeof s === 'object' && s.url ? s.url : null;
+      const content = url
+        ? `${text}<br><a href="${url}" target="_blank" rel="noopener">${url}</a>`
+        : text;
+      return `<div class="source-item"><span class="source-num">[${i+1}]</span><span class="source-text">${content}</span></div>`;
+    }).join('');
+    el.innerHTML = `
+      <div class="tag">${this.tag}</div>
+      <h2>Sources</h2>
+      <div class="sources-list">${items}</div>
+    `;
+    return el;
+  }
 }
 
 class Presentation {
-  constructor(slides) { this._slides = [...slides, new CompletionSlide()]; this._idx = 0; this._show(); }
-  _show() {
-    const s = this._slides[this._idx], stage = document.getElementById('stage');
-    document.getElementById('progress-bar').style.width = (this._idx / (this._slides.length-1) * 100) + '%';
-    document.getElementById('slide-counter').textContent = `${this._idx+1} / ${this._slides.length}`;
-    document.getElementById('btn-prev').style.visibility = this._idx > 0 ? 'visible' : 'hidden';
-    const next = document.getElementById('btn-next');
-    next.style.display = this._idx === this._slides.length-1 ? 'none' : '';
-    next.disabled = false;
-    const div = document.createElement('div'); div.className = 'slide'; div.innerHTML = s.render();
-    stage.innerHTML = ''; stage.appendChild(div); s.onMount();
-    if (!s.canAdvance()) next.disabled = true;
-  }
-  next() { const s = this._slides[this._idx]; if (!s.canAdvance()) return; s.onUnmount(); if (this._idx < this._slides.length-1) { this._idx++; this._show(); } }
-  prev() { if (this._idx > 0) { this._slides[this._idx].onUnmount(); this._idx--; this._show(); } }
-}
-document.addEventListener('keydown', e => { if (e.key==='ArrowRight') PRES.next(); if (e.key==='ArrowLeft') PRES.prev(); });
+  constructor(slides) {
+    this.slides = slides;
+    this.current = 0;
+    this.deck = document.getElementById('deck');
+    this.counter = document.getElementById('slide-counter');
+    this.bar = document.getElementById('progress-bar');
+    this.btnPrev = document.getElementById('btn-prev');
+    this.btnNext = document.getElementById('btn-next');
 
-/* ── DEMO ─────────────────────────────────────────── */
+    this.rendered = slides.map(s => s.render());
+    this.rendered.forEach(el => this.deck.appendChild(el));
+
+    this.btnPrev.addEventListener('click', () => this.go(this.current - 1));
+    this.btnNext.addEventListener('click', () => this.go(this.current + 1));
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  this.go(this.current + 1);
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    this.go(this.current - 1);
+    });
+    this.deck.addEventListener('quiz-answered', () => this.updateNav());
+
+    this.go(0);
+  }
+
+
+  isNextBlocked() {
+    const el = this.rendered[this.current];
+    return el && el.quizAnswered === false;
+  }
+
+  go(idx) {
+    if (idx < 0 || idx >= this.slides.length) return;
+    if (idx > this.current && this.isNextBlocked()) return;
+    if (this.rendered[this.current]) {
+      this.rendered[this.current].classList.remove('active');
+      this.rendered[this.current].classList.add('exit');
+      const prev = this.rendered[this.current];
+      setTimeout(() => prev.classList.remove('exit'), 460);
+    }
+    this.current = idx;
+    this.rendered[this.current].classList.add('active');
+    this.updateNav();
+  }
+
+  updateNav() {
+    const idx = this.current;
+    this.counter.textContent = `${idx + 1} / ${this.slides.length}`;
+    this.bar.style.width = `${((idx + 1) / this.slides.length) * 100}%`;
+    this.btnPrev.disabled = idx === 0;
+    this.btnNext.disabled = idx === this.slides.length - 1 || this.isNextBlocked();
+  }
+}
+
+/* ─── PRESENTATION CONTENT ───────────────────────────────── */
+
 const PRES = new Presentation([
 
   /* 0 — INTRO */
@@ -220,7 +935,7 @@ const PRES = new Presentation([
     title: 'What is Devolution?',
     body: [
       'Transfer of authority: Power is moved from Westminster to regional governments the Scottish Parliament, Welsh Senedd, and Northern Ireland Assembly, which can then make independent decisions.',
-      'The word originates from Latin, meaning "to roll down."',
+      'Origin of term Devolution: The word originates from Latin, meaning "to roll down."',
       'Not a federal system: Westminster theoretically retains parliamentary sovereignty and could reverse devolution, though in practice this is politically near impossible.',
       'Asymmetric: Different regions hold different levels and types of devolved power.',
     ],
@@ -242,7 +957,7 @@ const PRES = new Presentation([
     tag:   'Section 1, the Key Terms',
     title: 'Regional Identity',
     body: [
-      'People in Scotland, Wales, and Northern Ireland often feel a stronger regional identity than people in England. Rooted in distinct histories, cultures, and languages.',
+      'Regional Differences: People in Scotland, Wales, and Northern Ireland often feel a stronger regional identity than people in England. Rooted in distinct histories, cultures, and languages.',
       'Scotland: Deep connection to traditions and Highland culture.',
       'Wales: The Welsh language (Cymraeg) is a living marker of distinct nationhood.',
       'Northern Ireland: A complex identity shaped by unionist, nationalist, and mixed communities with their own political structures.',
@@ -254,8 +969,8 @@ const PRES = new Presentation([
     tag:   'Section 1, the Key Terms',
     title: 'Why Does This Still Matter Today?',
     body: [
-      'Brexit divide: Scotland and Northern Ireland voted Remain; England and Wales voted Leave. This created serious political tensions.',
-      'Northern Ireland was economically weakened by Brexit, and many Scots feel forced out of the EU against their will.',
+      'Brexit divide: Scotland and Northern Ireland voted "Remain". England and Wales voted "Leave". This created serious political tensions.',
+      'Northern Ireland and Scotland: Northern Ireland was economically weakened by Brexit, and many Scots feel forced out of the EU against their will.',
       'Independence pressure: These divisions have led many Scots to see devolution as insufficient and to push for full independence and EU reentry.',
       'Destabilisation risk: These pressures threaten to break up the United Kingdom itself.',
     ],
@@ -289,10 +1004,10 @@ const PRES = new Presentation([
     title:   'Key Milestones to 1999',
     variant: 'timeline',
     body: [
-      '1885 The Scottish Office is established: takes responsibility for education under a London appointed minister.',
+      '1885 The "Scottish Office" is established: takes responsibility for education under a London appointed minister.',
       '1886 First Home Rule Bill for Ireland, results: rejected.',
-      '1920 Northern Ireland gets limited self government under the Government of Ireland Act.',
-      '1922 to 1970 The Stormont government in Belfast governs Northern Ireland autonomously.',
+      '1920 Northern Ireland gets limited self-government under the Government of Ireland Act.',
+      '1922-1970 The Stormont government in Belfast governs Northern Ireland autonomously.',
       '1972 Westminster dissolves the Northern Ireland Assembly indefinitely, suspending devolution.',
       '1970s Labour attempts devolution for Scotland and Wales: results: referendums in 1979 fail.',
       '1990s John Major supports regional self government but remains politically unsuccessful in Scotland and Wales.',
@@ -365,7 +1080,7 @@ const PRES = new Presentation([
     body: [
       "SNP argument: Scotland has its own identity, resources, and a distinct political direction. Independence would mean direct control over oil revenue and the ability to rejoin the EU.",
       "Westminster's counter: Scotland benefits economically from the UK union. Independence would create serious economic instability and a hard border with England.",
-      "Underlying tension: The SNP argues devolution has not gone far enough, that Scots still feel powerless on the issues that matter most.",
+      "Underlying tension: The SNP (Scottish National Party) argues devolution has not gone far enough, that Scots still feel powerless on the issues that matter most.",
       "Westminster's fear: Granting a second independence referendum could inspire similar movements in Wales, fragmenting the entire UK.",
     ],
   }),
@@ -376,7 +1091,7 @@ const PRES = new Presentation([
     title: 'Open Questions and Unresolved Tensions',
     body: [
       "West Lothian Question: Scottish, Welsh, and Northern Irish MPs can vote on England only laws at Westminster, however English MPs have no equivalent say over devolved matters. Still unresolved.",
-      "NI Instability: The Assembly collapsed in 2017 to 2020 (DUP vs Sinn Féin disputes) and again in 2022 to 2024 over post Brexit trade issues.",
+      "North Ireland Instability: The Assembly collapsed in 2017–2020 (DUP, unionist party, vs Sinn Féin, nationalist party, disputes) and again in 2022–2024 over post-Brexit trade issues.",
       "England's problem: With roughly 85% of the UK population, England doesn't fit neatly into any federal model, for which no one has a clean answer.",
       "Parliamentary sovereignty vs. reality: Westminster could theoretically override devolved parliaments, but hasn't, and likely couldn't without a major political crisis.",
     ],
@@ -409,7 +1124,19 @@ const PRES = new Presentation([
     ],
   }),
 
-  /* 17 — OUTRO */
+  /* 17 — SOURCES */
+  new SourcesSlide({
+    tag: 'References',
+    sources: [
+      { label: 'YouTube, Devolution in the UK (video)', url: 'https://youtu.be/hTU_M_FH01Y' },
+      { label: 'Bundeszentrale für politische Bildung: Großbritannien nach der Devolution (APuZ)', url: 'https://www.bpb.de/shop/zeitschriften/apuz/28678/grossbritannien-nach-der-' },
+      { label: 'Local Government Association: Devolution in the UK: a historical perspective (PDF)', url: 'https://www.local.gov.uk/sites/default/files/documents/devolution-uk-historical--827.pdf' },
+      { label: 'BBC News: Devolution: What is it and how does it work?', url: 'https://www.bbc.com/news/uk-politics-54974078' },
+      { label: 'House of Commons Library: Devolution of powers to Scotland, Wales and Northern Ireland (Research Briefing CBP-8599)', url: 'https://commonslibrary.parliament.uk/research-briefings/cbp-8599/' },
+    ],
+  }),
+
+  /* 18 — OUTRO */
   new IntroSlide({
     tag:      'Thank You',
     title:    'Questions?',
