@@ -326,42 +326,92 @@
     margin-bottom: 28px;
     color: var(--text);
   }
-  .order-list {
+  /* click-to-rank layout */
+  .order-wrap {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    gap: 20px;
     width: 100%;
-    max-width: 740px;
+    max-width: 860px;
+    align-items: flex-start;
   }
-  .order-item {
+  @media (max-width: 700px) {
+    .order-wrap { flex-direction: column; }
+  }
+  .order-bank, .order-slots { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .order-col-label {
+    font-size: .72rem;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .bank-item {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 16px 20px;
+    padding: 13px 16px;
+    font-size: .88rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color .2s, background .2s, opacity .2s;
+    line-height: 1.4;
+  }
+  .bank-item:hover:not(.placed):not(.locked) { border-color: var(--accent); background: #222740; }
+  .bank-item.selected { border-color: var(--accent); background: #222740; font-weight: 600; }
+  .bank-item.placed   { opacity: .25; pointer-events: none; }
+  .bank-item.locked   { pointer-events: none; }
+  .slot-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 13px 16px;
+    font-size: .88rem;
+    color: var(--text);
     display: flex;
     align-items: center;
-    gap: 14px;
-    cursor: grab;
-    font-size: .93rem;
-    color: var(--text);
+    gap: 12px;
+    cursor: pointer;
     transition: border-color .2s, background .2s;
+    min-height: 48px;
+    line-height: 1.4;
   }
-  .order-item:active { cursor: grabbing; }
-  .order-item.drag-over { border-color: var(--accent); background: #222740; }
-  .order-num {
-    min-width: 26px;
-    height: 26px;
+  .slot-item:not(.locked):hover { border-color: var(--accent2); background: #1c2540; }
+  .slot-num {
+    min-width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: var(--border);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: .8rem;
+    font-size: .78rem;
     color: var(--accent);
     font-weight: 500;
+    flex-shrink: 0;
+  }
+  .slot-text { flex: 1; }
+  .slot-empty { color: var(--muted); font-style: italic; font-size: .82rem; }
+  .slot-x {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0 2px;
+    display: none;
+  }
+  .slot-x:hover { color: var(--red); }
+  .slot-item.filled .slot-x { display: block; }
+  .slot-item.correct { border-color: var(--green); background: rgba(82,217,122,.08); }
+  .slot-item.wrong   { border-color: var(--red);   background: rgba(217,82,82,.08); }
+  .order-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 4px;
   }
   .order-check-btn {
-    margin-top: 16px;
     background: var(--accent);
     color: #0d0f14;
     border: none;
@@ -374,6 +424,18 @@
     transition: opacity .2s;
   }
   .order-check-btn:hover { opacity: .85; }
+  .order-reset-btn {
+    background: none;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    cursor: pointer;
+    transition: border-color .2s, color .2s;
+  }
+  .order-reset-btn:hover { border-color: var(--accent); color: var(--text); }
   .order-result {
     margin-top: 12px;
     font-size: .9rem;
@@ -381,6 +443,58 @@
     display: none;
   }
   .order-result.visible { display: block; }
+
+  /* ── SOURCES SLIDE ───────────────────────── */
+  .sources-slide { align-items: flex-start; }
+  .sources-slide h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 28px;
+    border-left: 3px solid var(--accent);
+    padding-left: 20px;
+  }
+  .sources-list {
+    width: 100%;
+    max-width: 860px;
+    max-height: 65vh;
+    overflow-y: auto;
+    padding-right: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sources-list::-webkit-scrollbar { width: 4px; }
+  .sources-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .source-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+  }
+  .source-num {
+    font-family: 'Playfair Display', serif;
+    font-size: .85rem;
+    color: var(--accent);
+    flex-shrink: 0;
+    min-width: 20px;
+  }
+  .source-text {
+    font-size: .85rem;
+    line-height: 1.55;
+    color: #ccc8be;
+  }
+  .source-text a {
+    color: var(--accent2);
+    text-decoration: none;
+    word-break: break-all;
+  }
+  .source-text a:hover { text-decoration: underline; }
 
   /* ── NAV ─────────────────────────────────── */
   #nav {
@@ -600,59 +714,153 @@ class OrderingSlide {
   render() {
     const el = document.createElement('div');
     el.className = 'slide ordering-slide';
-    // shuffle
+    const uid      = Math.random().toString(36).slice(2);
     const shuffled = [...this.items].sort(() => Math.random() - .5);
     const correct  = this.items;
 
-    let inner = `<div class="tag">${this.tag || 'Order It'}</div>
-    <h2>${this.question}</h2>
-    <div class="order-list" id="ol-${Math.random().toString(36).slice(2)}"></div>
-    <button class="order-check-btn">Check Order</button>
-    <div class="order-result"></div>`;
-    el.innerHTML = inner;
+    // Build skeleton
+    el.innerHTML = `
+      <div class="tag">${this.tag || 'Order It'}</div>
+      <h2>${this.question}</h2>
+      <div class="order-wrap">
+        <div class="order-bank">
+          <div class="order-col-label">Items</div>
+          ${shuffled.map((t, i) => `<div class="bank-item" id="bank-${uid}-${i}">${t}</div>`).join('')}
+        </div>
+        <div class="order-slots">
+          <div class="order-col-label">Your order</div>
+          ${correct.map((_, i) => `
+            <div class="slot-item" id="slot-${uid}-${i}">
+              <span class="slot-num">${i+1}</span>
+              <span class="slot-text slot-empty">tap to place</span>
+              <span class="slot-x" id="slotx-${uid}-${i}">&#x2715;</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="order-actions">
+        <button class="order-check-btn">Check Order</button>
+        <button class="order-reset-btn">Reset</button>
+      </div>
+      <div class="order-result"></div>
+    `;
 
-    const list = el.querySelector('.order-list');
-    let dragSrc = null;
+    // State
+    const slots = new Array(correct.length).fill(null); // slot index -> text
+    let selected = null; // index into shuffled
 
-    const rebuild = (arr) => {
-      list.innerHTML = '';
-      arr.forEach((text, i) => {
-        const item = document.createElement('div');
-        item.className = 'order-item';
-        item.draggable = true;
-        item.dataset.text = text;
-        item.innerHTML = `<span class="order-num">${i+1}</span>${text}`;
-        item.addEventListener('dragstart', () => { dragSrc = item; item.style.opacity = '.4'; });
-        item.addEventListener('dragend',   () => { item.style.opacity = '1'; });
-        item.addEventListener('dragover',  e => { e.preventDefault(); item.classList.add('drag-over'); });
-        item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
-        item.addEventListener('drop', e => {
-          e.preventDefault();
-          item.classList.remove('drag-over');
-          if (dragSrc !== item) {
-            const items = [...list.querySelectorAll('.order-item')];
-            const fromIdx = items.indexOf(dragSrc);
-            const toIdx   = items.indexOf(item);
-            const newArr  = items.map(x => x.dataset.text);
-            newArr.splice(fromIdx, 1);
-            newArr.splice(toIdx, 0, dragSrc.dataset.text);
-            rebuild(newArr);
-          }
-        });
-        list.appendChild(item);
-      });
+    const bankEl = i  => el.querySelector(`#bank-${uid}-${i}`);
+    const slotEl = i  => el.querySelector(`#slot-${uid}-${i}`);
+
+    const renderSlot = i => {
+      const se = slotEl(i);
+      const t  = slots[i];
+      se.querySelector('.slot-text').textContent = t || 'tap to place';
+      se.querySelector('.slot-text').className   = 'slot-text' + (t ? '' : ' slot-empty');
+      se.classList.toggle('filled', !!t);
+      se.classList.remove('correct', 'wrong');
     };
-    rebuild(shuffled);
 
+    // Select from bank
+    shuffled.forEach((text, i) => {
+      bankEl(i).addEventListener('click', () => {
+        if (el.dataset.locked) return;
+        const be = bankEl(i);
+        if (be.classList.contains('placed')) return;
+        if (selected === i) { be.classList.remove('selected'); selected = null; return; }
+        if (selected !== null) bankEl(selected).classList.remove('selected');
+        be.classList.add('selected');
+        selected = i;
+      });
+    });
+
+    // Place into slot
+    correct.forEach((_, i) => {
+      slotEl(i).addEventListener('click', () => {
+        if (el.dataset.locked) return;
+        if (selected === null) return;
+        // Return existing occupant to bank
+        if (slots[i] !== null) {
+          const oldIdx = shuffled.indexOf(slots[i]);
+          if (oldIdx !== -1) bankEl(oldIdx).classList.remove('placed');
+        }
+        slots[i] = shuffled[selected];
+        bankEl(selected).classList.add('placed');
+        bankEl(selected).classList.remove('selected');
+        selected = null;
+        renderSlot(i);
+        el.querySelector('.order-result').className = 'order-result';
+      });
+
+      // Remove from slot
+      el.querySelector(`#slotx-${uid}-${i}`).addEventListener('click', e => {
+        e.stopPropagation();
+        if (el.dataset.locked || !slots[i]) return;
+        const oldIdx = shuffled.indexOf(slots[i]);
+        if (oldIdx !== -1) bankEl(oldIdx).classList.remove('placed');
+        slots[i] = null;
+        renderSlot(i);
+        el.querySelector('.order-result').className = 'order-result';
+      });
+    });
+
+    // Check
     el.querySelector('.order-check-btn').addEventListener('click', () => {
-      const current = [...list.querySelectorAll('.order-item')].map(x => x.dataset.text);
-      const ok = current.every((v, i) => v === correct[i]);
+      if (el.dataset.locked) return;
+      if (slots.some(s => s === null)) {
+        const res = el.querySelector('.order-result');
+        res.textContent = 'Fill all slots before checking.';
+        res.style.color = 'var(--muted)';
+        res.classList.add('visible');
+        return;
+      }
+      let allOk = true;
+      slots.forEach((t, i) => {
+        slotEl(i).classList.remove('correct', 'wrong');
+        const ok = t === correct[i];
+        slotEl(i).classList.add(ok ? 'correct' : 'wrong');
+        if (!ok) allOk = false;
+      });
       const res = el.querySelector('.order-result');
-      res.textContent = ok ? '✓ Correct order!' : '✗ Not quite — try again.';
-      res.style.color = ok ? 'var(--green)' : 'var(--red)';
+      res.textContent = allOk ? '✓ Perfect order!' : '✗ Some are wrong (red). Keep adjusting!';
+      res.style.color = allOk ? 'var(--green)' : 'var(--red)';
       res.classList.add('visible');
     });
 
+    // Reset
+    el.querySelector('.order-reset-btn').addEventListener('click', () => {
+      if (el.dataset.locked) return;
+      slots.fill(null);
+      slots.forEach((_, i) => renderSlot(i));
+      shuffled.forEach((_, i) => bankEl(i).classList.remove('placed', 'selected'));
+      selected = null;
+      el.querySelector('.order-result').className = 'order-result';
+    });
+
+    return el;
+  }
+}
+
+class SourcesSlide {
+  constructor({ tag, sources }) {
+    this.tag = tag || 'Sources';
+    this.sources = sources; // array of { label, url } or plain strings
+  }
+  render() {
+    const el = document.createElement('div');
+    el.className = 'slide sources-slide';
+    const items = this.sources.map((s, i) => {
+      const text = typeof s === 'string' ? s : s.label;
+      const url  = typeof s === 'object' && s.url ? s.url : null;
+      const content = url
+        ? `${text}<br><a href="${url}" target="_blank" rel="noopener">${url}</a>`
+        : text;
+      return `<div class="source-item"><span class="source-num">[${i+1}]</span><span class="source-text">${content}</span></div>`;
+    }).join('');
+    el.innerHTML = `
+      <div class="tag">${this.tag}</div>
+      <h2>Sources</h2>
+      <div class="sources-list">${items}</div>
+    `;
     return el;
   }
 }
@@ -727,7 +935,7 @@ const PRES = new Presentation([
     title: 'What is Devolution?',
     body: [
       'Transfer of authority: Power is moved from Westminster to regional governments the Scottish Parliament, Welsh Senedd, and Northern Ireland Assembly, which can then make independent decisions.',
-      'The word originates from Latin, meaning "to roll down."',
+      'Origin of term Devolution: The word originates from Latin, meaning "to roll down."',
       'Not a federal system: Westminster theoretically retains parliamentary sovereignty and could reverse devolution, though in practice this is politically near impossible.',
       'Asymmetric: Different regions hold different levels and types of devolved power.',
     ],
@@ -749,7 +957,7 @@ const PRES = new Presentation([
     tag:   'Section 1, the Key Terms',
     title: 'Regional Identity',
     body: [
-      'People in Scotland, Wales, and Northern Ireland often feel a stronger regional identity than people in England. Rooted in distinct histories, cultures, and languages.',
+      'Regional Differences: People in Scotland, Wales, and Northern Ireland often feel a stronger regional identity than people in England. Rooted in distinct histories, cultures, and languages.',
       'Scotland: Deep connection to traditions and Highland culture.',
       'Wales: The Welsh language (Cymraeg) is a living marker of distinct nationhood.',
       'Northern Ireland: A complex identity shaped by unionist, nationalist, and mixed communities with their own political structures.',
@@ -761,8 +969,8 @@ const PRES = new Presentation([
     tag:   'Section 1, the Key Terms',
     title: 'Why Does This Still Matter Today?',
     body: [
-      'Brexit divide: Scotland and Northern Ireland voted Remain; England and Wales voted Leave. This created serious political tensions.',
-      'Northern Ireland was economically weakened by Brexit, and many Scots feel forced out of the EU against their will.',
+      'Brexit divide: Scotland and Northern Ireland voted "Remain". England and Wales voted "Leave". This created serious political tensions.',
+      'Northern Ireland and Scotland: Northern Ireland was economically weakened by Brexit, and many Scots feel forced out of the EU against their will.',
       'Independence pressure: These divisions have led many Scots to see devolution as insufficient and to push for full independence and EU reentry.',
       'Destabilisation risk: These pressures threaten to break up the United Kingdom itself.',
     ],
@@ -796,10 +1004,10 @@ const PRES = new Presentation([
     title:   'Key Milestones to 1999',
     variant: 'timeline',
     body: [
-      '1885 The Scottish Office is established: takes responsibility for education under a London appointed minister.',
+      '1885 The "Scottish Office" is established: takes responsibility for education under a London appointed minister.',
       '1886 First Home Rule Bill for Ireland, results: rejected.',
-      '1920 Northern Ireland gets limited self government under the Government of Ireland Act.',
-      '1922 to 1970 The Stormont government in Belfast governs Northern Ireland autonomously.',
+      '1920 Northern Ireland gets limited self-government under the Government of Ireland Act.',
+      '1922-1970 The Stormont government in Belfast governs Northern Ireland autonomously.',
       '1972 Westminster dissolves the Northern Ireland Assembly indefinitely, suspending devolution.',
       '1970s Labour attempts devolution for Scotland and Wales: results: referendums in 1979 fail.',
       '1990s John Major supports regional self government but remains politically unsuccessful in Scotland and Wales.',
@@ -872,7 +1080,7 @@ const PRES = new Presentation([
     body: [
       "SNP argument: Scotland has its own identity, resources, and a distinct political direction. Independence would mean direct control over oil revenue and the ability to rejoin the EU.",
       "Westminster's counter: Scotland benefits economically from the UK union. Independence would create serious economic instability and a hard border with England.",
-      "Underlying tension: The SNP argues devolution has not gone far enough, that Scots still feel powerless on the issues that matter most.",
+      "Underlying tension: The SNP (Scottish National Party) argues devolution has not gone far enough, that Scots still feel powerless on the issues that matter most.",
       "Westminster's fear: Granting a second independence referendum could inspire similar movements in Wales, fragmenting the entire UK.",
     ],
   }),
@@ -883,7 +1091,7 @@ const PRES = new Presentation([
     title: 'Open Questions and Unresolved Tensions',
     body: [
       "West Lothian Question: Scottish, Welsh, and Northern Irish MPs can vote on England only laws at Westminster, however English MPs have no equivalent say over devolved matters. Still unresolved.",
-      "NI Instability: The Assembly collapsed in 2017 to 2020 (DUP vs Sinn Féin disputes) and again in 2022 to 2024 over post Brexit trade issues.",
+      "North Ireland Instability: The Assembly collapsed in 2017–2020 (DUP, unionist party, vs Sinn Féin, nationalist party, disputes) and again in 2022–2024 over post-Brexit trade issues.",
       "England's problem: With roughly 85% of the UK population, England doesn't fit neatly into any federal model, for which no one has a clean answer.",
       "Parliamentary sovereignty vs. reality: Westminster could theoretically override devolved parliaments, but hasn't, and likely couldn't without a major political crisis.",
     ],
@@ -916,7 +1124,19 @@ const PRES = new Presentation([
     ],
   }),
 
-  /* 17 — OUTRO */
+  /* 17 — SOURCES */
+  new SourcesSlide({
+    tag: 'References',
+    sources: [
+      { label: 'YouTube, Devolution in the UK (video)', url: 'https://youtu.be/hTU_M_FH01Y' },
+      { label: 'Bundeszentrale für politische Bildung: Großbritannien nach der Devolution (APuZ)', url: 'https://www.bpb.de/shop/zeitschriften/apuz/28678/grossbritannien-nach-der-' },
+      { label: 'Local Government Association: Devolution in the UK: a historical perspective (PDF)', url: 'https://www.local.gov.uk/sites/default/files/documents/devolution-uk-historical--827.pdf' },
+      { label: 'BBC News: Devolution: What is it and how does it work?', url: 'https://www.bbc.com/news/uk-politics-54974078' },
+      { label: 'House of Commons Library: Devolution of powers to Scotland, Wales and Northern Ireland (Research Briefing CBP-8599)', url: 'https://commonslibrary.parliament.uk/research-briefings/cbp-8599/' },
+    ],
+  }),
+
+  /* 18 — OUTRO */
   new IntroSlide({
     tag:      'Thank You',
     title:    'Questions?',
