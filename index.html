@@ -703,11 +703,17 @@
 <script>
 /* ─── SLIDE CLASSES ──────────────────────────────────────── */
 
+let x = 0;
+
 class IntroSlide {
-  constructor({ tag, title, subtitle }) {
-    this.tag = tag; this.title = title; this.subtitle = subtitle;
+  constructor({ tag, title, subtitle, score}) {
+    this.tag = tag; this.title = title; this.subtitle = subtitle; this.score = score
   }
   render() {
+    if (this.score == true) {
+      this.subtitle = "You got a score of" + " " + String(x);
+    } 
+
     const el = document.createElement('div');
     el.className = 'slide intro-slide';
     
@@ -801,6 +807,7 @@ class QuizSlide {
     el.quizAnswered = false;
 
     const unlock = () => {
+      
       el.quizAnswered = true;
       el.dispatchEvent(new CustomEvent('quiz-answered', { bubbles: true }));
     };
@@ -818,10 +825,15 @@ class QuizSlide {
       const hintEl = el.querySelector('.quiz-hint');
       btns.forEach(b => b.addEventListener('click', () => {
         if (el.quizAnswered) return;
+        const isCorrect = +b.dataset.idx === this.answer;
         btns.forEach(x => x.classList.add(+x.dataset.idx === this.answer ? 'correct' : 'wrong'));
         hintEl.classList.add('visible');
         el.querySelector('.quiz-gate-msg').style.display = 'none';
+        if (isCorrect) {
+          x = x + 1;
+        }
         unlock();
+
       }));
     } else {
       inner += `<div class="text-input-wrap">
@@ -841,6 +853,10 @@ class QuizSlide {
         const correct = typeof this.answer === 'string'
           ? val === this.answer.toLowerCase()
           : this.answer.some(a => val === a.toLowerCase());
+        if (correct) {
+          x = x + 1;
+        }
+
         input.classList.toggle('correct', correct);
         input.classList.toggle('wrong', !correct);
         hint.classList.add('visible');
@@ -981,6 +997,7 @@ class OrderingSlide {
       res.classList.add('visible');
       if (allOk && !el.quizAnswered) {
         el.querySelector('.order-gate-msg').style.display = 'none';
+        x = x + 1;
         unlock();
       }
     });
@@ -1064,7 +1081,16 @@ class Presentation {
       setTimeout(() => prev.classList.remove('exit'), 460);
     }
     this.current = idx;
-    this.rendered[this.current].classList.add('active');
+    const currentEl = this.rendered[this.current];
+
+    if (this.slides[this.current] instanceof IntroSlide && this.slides[this.current].score === true) {
+      const subtitleEl = currentEl.querySelector('.subtitle');
+      if (subtitleEl) {
+        subtitleEl.textContent = "You got a score of " + x +"/5";
+      }
+    } //fuck javascript === true :/
+
+    currentEl.classList.add('active');
     this.updateNav();
   }
 
@@ -1084,6 +1110,7 @@ const PRES = new Presentation([
     tag:      'Hooman & Julian',
     title:    'How has devolution strengthened regional identities in Scotland, Wales, and Northern Ireland?',
     subtitle: 'A look at power, identity and the future of the United Kingdom',
+    score: false,
   }),
 
   /* 1 — WHAT IS DEVOLUTION */
@@ -1311,7 +1338,8 @@ const PRES = new Presentation([
   new IntroSlide({
     tag:      'Thank You',
     title:    'Questions?',
-    subtitle: 'Hooman & Julian',
+    subtitle: 'You got a score of:',
+    score: true,
   }),
 
 ]);
